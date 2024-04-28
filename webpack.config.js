@@ -11,7 +11,6 @@ module.exports = {
     clean: true,
   },
   mode: 'production',
-  watch: true,
   resolve: {
     extensions: ['.js'],
   },
