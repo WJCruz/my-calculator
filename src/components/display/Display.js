@@ -5,7 +5,7 @@ import './display.css';
 function Display(props) {
   return (
     <div className="container-display">
-      <p>{props.initialState.currentValue || 0}</p>
+      <p>{parseFloat(props.initialState.currentValue)}</p>
     </div>
   );
 }

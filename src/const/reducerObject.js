@@ -1,4 +1,12 @@
-import Decimal from 'decimal.js';
+import calculateResult from '../utils/operations';
+
+const initialState = {
+  previusValue: null,
+  currentValue: '0',
+  operator: null,
+  transitionValue: true,
+  isRadian: false,
+};
 
 const actionTypes = {
   addDigit: 'ADD_DIGIT',
@@ -6,51 +14,49 @@ const actionTypes = {
   setOperator: 'SET_OPERATOR',
   calculateResult: 'CALCULATE_RESULT',
   resetValues: 'RESET_VALUES',
+  changeTypeAngle: 'CHANGE_TYPE_ANGLE',
 };
 
-const calculateResult = (operator, previusValue, currentValue) => {
-  switch(operator) {
-    case '+':
-      return new Decimal(previusValue).plus(new Decimal(currentValue));
-    case '-':
-      return new Decimal(previusValue).minus(new Decimal(currentValue));
-    case 'x':
-      return new Decimal(previusValue).times(new Decimal(currentValue));
-    case '÷':
-      return new Decimal(previusValue).dividedBy(new Decimal(currentValue));
-    case '%':
-      return new Decimal(currentValue).dividedBy(new Decimal('100'));
-    case '+/-':
-      return new Decimal(currentValue).negated();
+const reducerObject = (state, action) => {
+  switch(action.type) {
+    case actionTypes.addDigit:
+      return {
+        ...state,
+        currentValue: state.currentValue + action.payload,
+      };
+    case actionTypes.setFirstDigit:
+      return {
+        ...state,
+        currentValue: action.payload,
+        transitionValue: false,
+      };
+    case actionTypes.setOperator:
+      return {
+        ...state,
+        operator: action.payload,
+        previusValue: state.currentValue,
+        transitionValue: true,
+      };
+    case actionTypes.calculateResult:
+      return {
+        ...state,
+        operator: null,
+        currentValue: calculateResult(state).toString(),
+        transitionValue: true,
+      };
+    case actionTypes.resetValues:
+      return {
+        ...action.payload,
+        isRadian: state.isRadian,
+      };
+    case actionTypes.changeTypeAngle:
+      return {
+        ...state,
+        isRadian: action.payload,
+      };
     default:
-      return currentValue;
+      return state;
   }
 };
 
-const reducerObject = (state, payload) => ({
-  [actionTypes.addDigit]: {
-    ...state,
-    currentValue: state.currentValue + payload,
-  },
-  [actionTypes.setFirstDigit]: {
-    ...state,
-    currentValue: payload,
-    transitionValue: false,
-  },
-  [actionTypes.setOperator]: {
-    ...state,
-    operator: payload,
-    previusValue: state.currentValue,
-    transitionValue: true,
-  },
-  [actionTypes.calculateResult]: {
-    ...state,
-    currentValue: (calculateResult(state.operator, state.previusValue, state.currentValue)).toString(),
-    transitionValue: payload,
-  },
-  [actionTypes.resetValues]: {
-    ...payload,
-  },
-})
-
-export { reducerObject, actionTypes };
+export { reducerObject, actionTypes, initialState };
